@@ -3,9 +3,14 @@ import { GAME_CONFIG } from "./config.js";
 export function createInitialState() {
   return {
     score: 0,
+    combo: 0,
+    level: 1,
+    difficulty: 1,
     lives: GAME_CONFIG.maxLives,
     timeLeft: GAME_CONFIG.totalTimeSeconds,
     isGameOver: false,
+    isPaused: false,
+    result: "playing",
     player: {
       x: GAME_CONFIG.width / 2 - GAME_CONFIG.playerWidth / 2,
       y: GAME_CONFIG.height - GAME_CONFIG.playerHeight - 12,
@@ -19,6 +24,12 @@ export function createInitialState() {
     effects: {
       shieldSecondsLeft: 0,
     },
+    metrics: {
+      stars: 0,
+      bombsHit: 0,
+      powerUps: 0,
+    },
+    comboTimer: 0,
     spawn: {
       starTimer: 0,
       bombTimer: 0,

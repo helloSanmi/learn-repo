@@ -4,28 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Star Dash</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-    <main class="app">
-      <header class="hud">
-        <h1>Star Dash</h1>
-        <div class="hud-stats">
-          <span>Score: <strong id="score">0</strong></span>
-          <span>Lives: <strong id="lives">3</strong></span>
-          <span>Time: <strong id="time">45</strong></span>
-          <span>Power-Up: <strong id="power-up">None</strong></span>
-        </div>
-      </header>
-
-      <canvas id="game-canvas" width="720" height="420" aria-label="Star Dash game area"></canvas>
-
-      <section class="controls">
-        <p>Move: Arrow keys / A D</p>
-        <button id="restart-btn" type="button">Restart</button>
-      </section>
-    </main>
-
-    <script type="module" src="src/main.js"></script>
+    <div id="root"></div>
+    <script src="/app-config.js"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

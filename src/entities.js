@@ -5,26 +5,27 @@ function randomRange(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function createFalling(radius) {
+function createFalling(state, radius) {
+  const difficulty = state.difficulty || 1;
   return {
     x: randomRange(radius, GAME_CONFIG.width - radius),
     y: -radius,
     radius,
-    speed: randomRange(GAME_CONFIG.fallSpeedMin, GAME_CONFIG.fallSpeedMax),
+    speed: randomRange(GAME_CONFIG.fallSpeedMin, GAME_CONFIG.fallSpeedMax) * difficulty,
   };
 }
 
 export function spawnStar(state) {
-  state.stars.push(createFalling(GAME_CONFIG.starRadius));
+  state.stars.push(createFalling(state, GAME_CONFIG.starRadius));
 }
 
 export function spawnBomb(state) {
-  state.bombs.push(createFalling(GAME_CONFIG.bombRadius));
+  state.bombs.push(createFalling(state, GAME_CONFIG.bombRadius));
 }
 
 export function spawnPowerUp(state) {
   state.powerUps.push({
-    ...createFalling(GAME_CONFIG.powerUpRadius),
+    ...createFalling(state, GAME_CONFIG.powerUpRadius),
     type: POWER_UP_TYPES.SHIELD,
   });
 }
@@ -44,13 +45,15 @@ function updateFalling(list, deltaSeconds) {
 }
 
 export function updateEntities(state, deltaSeconds) {
+  let starHits = 0, bombHits = 0, powerHits = 0;
   updateFalling(state.stars, deltaSeconds);
   updateFalling(state.bombs, deltaSeconds);
   updateFalling(state.powerUps, deltaSeconds);
 
   state.stars = state.stars.filter((star) => {
     if (overlapsPlayer(star, state.player)) {
-      state.score += 10;
+      state.metrics.stars += 1;
+      starHits += 1;
       return false;
     }
     return star.y - star.radius <= GAME_CONFIG.height;
@@ -60,6 +63,8 @@ export function updateEntities(state, deltaSeconds) {
     if (overlapsPlayer(bomb, state.player)) {
       if (!isShieldActive(state)) {
         state.lives -= 1;
+        state.metrics.bombsHit += 1;
+        bombHits += 1;
       }
       return false;
     }
@@ -69,8 +74,11 @@ export function updateEntities(state, deltaSeconds) {
   state.powerUps = state.powerUps.filter((powerUp) => {
     if (overlapsPlayer(powerUp, state.player)) {
       applyPowerUp(state, powerUp.type);
+      state.metrics.powerUps += 1;
+      powerHits += 1;
       return false;
     }
     return powerUp.y - powerUp.radius <= GAME_CONFIG.height;
   });
+  return { starHits, bombHits, powerHits };
 }
