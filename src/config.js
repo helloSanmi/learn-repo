@@ -15,4 +15,8 @@ export const GAME_CONFIG = {
   fallSpeedMax: 260,
   maxLives: 3,
   shieldDurationSeconds: 6,
+  bossLevelStep: 4,
+  bossWaveDurationSeconds: 12,
+  bossHitsToClear: 3,
+  specialCooldownSeconds: 14,
 };

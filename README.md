@@ -67,7 +67,7 @@ Deployment starter files are in:
 ## Controls
 
 - Move: mouse/touch/trackpad, `ArrowLeft`/`ArrowRight`, or `A`/`D`
-- Session controls: `Pause`, `Resume`, `Restart`
+- Session controls: `Pause`, `Resume`, `Restart`, `Special Pulse`
 
 Collect blue stars for points, avoid red bombs, and survive until time runs out.
 
@@ -78,6 +78,7 @@ Scoring:
 - Higher combo increases score multiplier.
 - Bomb hits or combo timeout reset combo.
 - Power-ups also add bonus points.
+- Gold stars grant extra points.
 
 ## Product Features
 
@@ -86,4 +87,7 @@ Scoring:
 - Pause/resume/restart controls.
 - Combo multiplier scoring and live combo HUD.
 - Best score tracking in-game.
+- Boss wave encounter every 4 levels (defeat target before timer expires).
+- Special Pulse ability with cooldown.
+- Multiple power-up types: Shield, Freeze, and Rush.
 - Top runs leaderboard and recent run history.
