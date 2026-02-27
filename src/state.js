@@ -23,13 +23,24 @@ export function createInitialState() {
     powerUps: [],
     effects: {
       shieldSecondsLeft: 0,
+      freezeSecondsLeft: 0,
+      feverSecondsLeft: 0,
+      specialCooldownLeft: 0,
     },
     metrics: {
       stars: 0,
+      goldStars: 0,
       bombsHit: 0,
       powerUps: 0,
     },
     comboTimer: 0,
+    boss: {
+      active: false,
+      hp: 0,
+      timeLeft: 0,
+      nextLevel: GAME_CONFIG.bossLevelStep,
+      target: null,
+    },
     spawn: {
       starTimer: 0,
       bombTimer: 0,

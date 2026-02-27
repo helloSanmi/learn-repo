@@ -1,84 +1,26 @@
 import { GAME_CONFIG } from "./config.js";
-import { applyPowerUp, isShieldActive, POWER_UP_TYPES } from "./powerups.js";
+import { applyPowerUp, isShieldActive, pickPowerUpType } from "./powerups.js";
 
-function randomRange(min, max) {
-  return Math.random() * (max - min) + min;
-}
+const rr = (a, b) => Math.random() * (b - a) + a;
+const mk = (s, r) => ({ x: rr(r, GAME_CONFIG.width - r), y: -r, radius: r, speed: rr(GAME_CONFIG.fallSpeedMin, GAME_CONFIG.fallSpeedMax) * (s.difficulty || 1) });
+const ov = (c, p) => { const nx = Math.max(p.x, Math.min(c.x, p.x + p.width)); const ny = Math.max(p.y, Math.min(c.y, p.y + p.height)); const dx = c.x - nx, dy = c.y - ny; return dx * dx + dy * dy <= c.radius * c.radius; };
+const mv = (list, dt) => { for (const i of list) i.y += i.speed * dt; };
 
-function createFalling(state, radius) {
-  const difficulty = state.difficulty || 1;
-  return {
-    x: randomRange(radius, GAME_CONFIG.width - radius),
-    y: -radius,
-    radius,
-    speed: randomRange(GAME_CONFIG.fallSpeedMin, GAME_CONFIG.fallSpeedMax) * difficulty,
-  };
-}
+export const spawnStar = (s) => s.stars.push({ ...mk(s, GAME_CONFIG.starRadius), kind: Math.random() < 0.14 ? "gold" : "normal" });
+export const spawnBomb = (s) => s.bombs.push(mk(s, GAME_CONFIG.bombRadius));
+export const spawnPowerUp = (s) => s.powerUps.push({ ...mk(s, GAME_CONFIG.powerUpRadius), type: pickPowerUpType() });
+export const spawnBossTarget = (s) => { s.boss.target = { x: rr(30, GAME_CONFIG.width - 30), y: -22, radius: 20, speed: 140 }; };
 
-export function spawnStar(state) {
-  state.stars.push(createFalling(state, GAME_CONFIG.starRadius));
-}
-
-export function spawnBomb(state) {
-  state.bombs.push(createFalling(state, GAME_CONFIG.bombRadius));
-}
-
-export function spawnPowerUp(state) {
-  state.powerUps.push({
-    ...createFalling(state, GAME_CONFIG.powerUpRadius),
-    type: POWER_UP_TYPES.SHIELD,
-  });
-}
-
-function overlapsPlayer(circle, player) {
-  const nearestX = Math.max(player.x, Math.min(circle.x, player.x + player.width));
-  const nearestY = Math.max(player.y, Math.min(circle.y, player.y + player.height));
-  const dx = circle.x - nearestX;
-  const dy = circle.y - nearestY;
-  return dx * dx + dy * dy <= circle.radius * circle.radius;
-}
-
-function updateFalling(list, deltaSeconds) {
-  for (const item of list) {
-    item.y += item.speed * deltaSeconds;
+export function updateEntities(state, dt) {
+  let starHits = 0, goldHits = 0, bombHits = 0, powerHits = 0, bossHits = 0;
+  mv(state.stars, dt); mv(state.bombs, dt); mv(state.powerUps, dt);
+  state.stars = state.stars.filter((v) => { if (ov(v, state.player)) { if (v.kind === "gold") { state.metrics.goldStars += 1; goldHits += 1; } else { state.metrics.stars += 1; starHits += 1; } return false; } return v.y - v.radius <= GAME_CONFIG.height; });
+  state.bombs = state.bombs.filter((v) => { if (ov(v, state.player)) { if (!isShieldActive(state)) { state.lives -= 1; state.metrics.bombsHit += 1; bombHits += 1; } return false; } return v.y - v.radius <= GAME_CONFIG.height; });
+  state.powerUps = state.powerUps.filter((v) => { if (ov(v, state.player)) { applyPowerUp(state, v.type); state.metrics.powerUps += 1; powerHits += 1; return false; } return v.y - v.radius <= GAME_CONFIG.height; });
+  if (state.boss.target) {
+    state.boss.target.y += state.boss.target.speed * dt;
+    if (ov(state.boss.target, state.player)) { bossHits += 1; state.boss.target = null; }
+    else if (state.boss.target.y - state.boss.target.radius > GAME_CONFIG.height) state.boss.target = null;
   }
-}
-
-export function updateEntities(state, deltaSeconds) {
-  let starHits = 0, bombHits = 0, powerHits = 0;
-  updateFalling(state.stars, deltaSeconds);
-  updateFalling(state.bombs, deltaSeconds);
-  updateFalling(state.powerUps, deltaSeconds);
-
-  state.stars = state.stars.filter((star) => {
-    if (overlapsPlayer(star, state.player)) {
-      state.metrics.stars += 1;
-      starHits += 1;
-      return false;
-    }
-    return star.y - star.radius <= GAME_CONFIG.height;
-  });
-
-  state.bombs = state.bombs.filter((bomb) => {
-    if (overlapsPlayer(bomb, state.player)) {
-      if (!isShieldActive(state)) {
-        state.lives -= 1;
-        state.metrics.bombsHit += 1;
-        bombHits += 1;
-      }
-      return false;
-    }
-    return bomb.y - bomb.radius <= GAME_CONFIG.height;
-  });
-
-  state.powerUps = state.powerUps.filter((powerUp) => {
-    if (overlapsPlayer(powerUp, state.player)) {
-      applyPowerUp(state, powerUp.type);
-      state.metrics.powerUps += 1;
-      powerHits += 1;
-      return false;
-    }
-    return powerUp.y - powerUp.radius <= GAME_CONFIG.height;
-  });
-  return { starHits, bombHits, powerHits };
+  return { starHits, goldHits, bombHits, powerHits, bossHits };
 }

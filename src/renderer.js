@@ -1,5 +1,5 @@
 import { GAME_CONFIG } from "./config.js";
-import { isShieldActive } from "./powerups.js";
+import { getPowerUpColor, isShieldActive } from "./powerups.js";
 
 export function createRenderer(canvas) {
   const ctx = canvas.getContext("2d");
@@ -56,9 +56,22 @@ export function createRenderer(canvas) {
     render(state) {
       clear();
       drawPlayer(state.player, isShieldActive(state));
-      state.stars.forEach((star) => drawCircle(star, "#77ddff"));
+      state.stars.forEach((star) => drawCircle(star, star.kind === "gold" ? "#f5b64c" : "#77ddff"));
       state.bombs.forEach((bomb) => drawCircle(bomb, "#ff6262"));
-      state.powerUps.forEach((powerUp) => drawCircle(powerUp, "#73ffb6"));
+      state.powerUps.forEach((powerUp) => drawCircle(powerUp, getPowerUpColor(powerUp.type)));
+      if (state.boss.target) drawCircle(state.boss.target, "#d96bff");
+      if (state.effects.feverSecondsLeft > 0) {
+        ctx.fillStyle = "rgba(245, 182, 76, 0.08)";
+        ctx.fillRect(0, 0, GAME_CONFIG.width, GAME_CONFIG.height);
+      }
+      if (state.effects.freezeSecondsLeft > 0) {
+        ctx.fillStyle = "rgba(110, 179, 247, 0.09)";
+        ctx.fillRect(0, 0, GAME_CONFIG.width, GAME_CONFIG.height);
+      }
+      if (state.boss.active) {
+        ctx.fillStyle = "rgba(217, 107, 255, 0.08)";
+        ctx.fillRect(0, 0, GAME_CONFIG.width, GAME_CONFIG.height);
+      }
 
       if (state.isGameOver) {
         drawGameOver(state);
