@@ -8,9 +8,10 @@
 name: Build and deploy Node.js app to Azure Web App - learntestnew
 
 on:
-  # 2) Auto-run this workflow whenever code is pushed to main.
+  # 2) Auto-run this workflow whenever code is pushed to branch.
   push:
     branches:
+      - dev
       - main
   # 3) Also allow running manually from the GitHub Actions UI.
   workflow_dispatch:
