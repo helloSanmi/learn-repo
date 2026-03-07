@@ -40,10 +40,14 @@
 
 name: Deploy to Azure VM (PM2)
 
+# on:
+#   push:
+#     branches:
+#       - main
+
 on:
-  push:
-    branches:
-      - main
+  # Manual trigger only. This avoids deploying to the VM on every push.
+  workflow_dispatch:
 
 jobs:
 
