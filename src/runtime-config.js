@@ -5,6 +5,6 @@ function fromWindow() {
 export function getAppConfig() {
   const w = fromWindow();
   return {
-    appTitle: w.appTitle || import.meta.env.VITE_APP_TITLE || "Star Dash",
+    appTitle: w.appTitle || import.meta.env.VITE_APP_TITLE || "Taskline",
   };
 }

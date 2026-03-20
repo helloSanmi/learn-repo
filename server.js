@@ -11,7 +11,7 @@ const MIME = { ".html": "text/html; charset=utf-8", ".js": "application/javascri
 
 const appConfig = () => {
   const cfg = {
-    appTitle: process.env.APP_TITLE || "Star Dash",
+    appTitle: process.env.APP_TITLE || "Taskline",
   };
   return `window.__APP_CONFIG__=${JSON.stringify(cfg)};`;
 };
@@ -41,6 +41,6 @@ createServer(async (req, res) => {
     }
   }
 }).listen(PORT, "0.0.0.0", () => {
-  console.log(`APP_TITLE=${process.env.APP_TITLE || "Star Dash"}`);
-  console.log(`Star Dash listening on port ${PORT}`);
+  console.log(`APP_TITLE=${process.env.APP_TITLE || "Taskline"}`);
+  console.log(`Taskline listening on port ${PORT}`);
 });
